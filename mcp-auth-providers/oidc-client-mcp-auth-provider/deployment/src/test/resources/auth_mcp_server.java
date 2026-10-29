@@ -4,10 +4,14 @@
 //DEPS io.quarkiverse.mcp:quarkus-mcp-server-http:2.0.0.Beta3
 //DEPS io.quarkiverse.mcp:quarkus-mcp-server-websocket:2.0.0.Beta3
 
+import java.util.stream.Collectors;
+
 import jakarta.inject.Inject;
 
+import io.quarkiverse.mcp.server.Roots;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkus.vertx.http.runtime.CurrentVertxRequest;
+import io.smallrye.mutiny.Uni;
 
 public class auth_mcp_server {
 
@@ -17,6 +21,11 @@ public class auth_mcp_server {
     @Tool(description = "Returns the client's authentication token")
     public String getToken() {
         return request.getCurrent().request().headers().get("Authorization");
+    }
+
+    @Tool(description = "Requests the client's roots")
+    public Uni<String> readRoots(Roots roots) {
+        return roots.list().map(list -> list.stream().map(root -> root.uri()).collect(Collectors.joining(", ")));
     }
 
 }
